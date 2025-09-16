@@ -31,8 +31,8 @@
 // const char* password = "";
 // const char* redir_ssid = "";
 // const char* redir_password = "";
-const char* API_KEY = "AIzaSyAna-OQQWQ81_HTzVJZAU4tr0AZ66a1b_4";                                // Firebase API key
-const char* DB_URL = "https://esp32-e8918-default-rtdb.asia-southeast1.firebasedatabase.app/";  // Firebase Database URL
+const char* API_KEY = "";  // Firebase API key
+const char* DB_URL = "";   // Firebase Database URL
 bool signUpOk = false;
 
 
