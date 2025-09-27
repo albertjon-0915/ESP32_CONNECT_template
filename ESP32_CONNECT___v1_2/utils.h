@@ -18,7 +18,7 @@ struct DebugClass : public Stream {
   int peek() override { return -1; }
   size_t write(uint8_t) override { return 1; }
 
-  template <typename T>c:\Users\Aj Bros's\Desktop\New folder\ino__\ESP32_CONNECT\ESP_CONNECT_v1\routes.h
+  template <typename T>
   void print(const T&) {}
   template <typename T>
   void println(const T&) {}
