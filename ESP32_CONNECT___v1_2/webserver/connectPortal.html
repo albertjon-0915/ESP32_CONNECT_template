@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wi-Fi Connect Portal</title>
+    <style>
+        /* Base styles for the body */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+            margin: 0;
+        }
+
+        /* Container for the portal form */
+        .portal-container {
+            background-color: #242424;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 24rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+            border: 1px solid #333;
+        }
+
+        /* Styles for the main heading */
+        .portal-heading {
+            font-size: 1.875rem; /* 30px */
+            font-weight: 500;
+            text-align: center;
+            letter-spacing: 0.05em;
+            align-self: center;
+        }
+
+        /* Styles for input fields */
+        .input-field {
+            background-color: #2a2a2a;
+            color: #f0f0f0;
+            border: 1px solid #444;
+            /* Reverted width to 100% to fill the container and provide symmetry with the edges. */
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            align-self: center;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #555;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Styles for the connect button */
+        .connect-button {
+            background-color: #3a3a3a;
+            border: 1px solid #444;
+            color: #f0f0f0;
+            width: 65%;
+            padding: 0.75rem;
+            font-weight: 600;
+            border-radius: 0.75rem;
+            font-size: 1.125rem;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            align-self: center;
+        }
+
+        .connect-button:hover {
+            background-color: #444;
+            transform: translateY(-2px);
+        }
+
+        /* Styles for the new status indicator */
+        .status-indicator {
+            background-color: transparent;
+            color: #3cb371;
+            padding: 0.75rem 0;
+            border: none;
+            text-align: center;
+            /* Reverted width to 100% to fill the container. */
+            width: 100%;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* New styles for the revised status indicator content */
+        .status-connected {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #44b76e;
+        }
+
+        .status-network {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: #44b76e;
+        }
+
+        .circled-indicator {
+            font-size: 0.7rem;
+            margin-right: 8px; /* Added margin for spacing between icon and text */
+        }
+        
+        /* New styles for the reset tag */
+        .reset-tag {
+            font-size: 0.75rem;
+            color: #aaaaaa;
+            text-decoration: underline;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .reset-tag:hover {
+            color: #dddddd;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main container for the portal -->
+    <div class="portal-container">
+        <h1 class="portal-heading">
+            ESP32 Portal
+        </h1>
+
+        <!-- Status Indicator -->
+        <div class="status-indicator">
+            <div class="status-connected"><span class="circled-indicator">🟢</span> Connected</div>
+            <div class="status-network">Network</div>
+        </div>
+
+        <!-- SSID Input -->
+        <input id="ssid-input" type="text" placeholder="Network Name (SSID)" class="input-field">
+
+        <!-- Password Input -->
+        <input id="password-input" type="password" placeholder="Password" class="input-field">
+
+        <!-- Connect Button -->
+        <button id="connect-button" class="connect-button">
+            Connect
+        </button>
+        
+        <!-- Reset Tag -->
+        <div class="reset-tag">
+            Disconnect and reset wifi connection?
+        </div>
+
+        <!-- Message box for validation -->
+        <div id="message-box" class="message-box"></div>
+    </div>
+
+    <script>
+        const connectButton = document.getElementById('connect-button');
+        const ssidInput = document.getElementById('ssid-input');
+        const passwordInput = document.getElementById('password-input');
+        const messageBox = document.getElementById('message-box');
+
+        // Event listener for the connect button click
+        connectButton.addEventListener('click', () => {
+            const ssid = ssidInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // Simple validation to ensure fields are not empty
+            if (!ssid) {
+                showMessage('Please enter the network SSID.');
+                return;
+            }
+
+            // Constructing a new URL with the provided data as query parameters
+            const url = new URL(window.location.href);
+            url.searchParams.set('ssid', ssid);
+            url.searchParams.set('password', password);
+
+            // Navigate to the new URL
+            window.location.href = url.toString();
+        });
+
+        // Function to show a temporary message to the user
+        function showMessage(message) {
+            messageBox.textContent = message;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

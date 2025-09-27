@@ -1,0 +1,5 @@
+# Ignore the whole test folder
+test/
+
+# Ignore just that one file inside nested folders
+ESP32_CONNECT___v1_2/tools/arduino-littlefs-upload-1.5.4.vsix

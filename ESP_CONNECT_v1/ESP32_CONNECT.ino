@@ -197,7 +197,7 @@ void loop() {
     asyncDelay(staConnection);
     return;
   }
-  
+
   preferences.putBool("isConnected", true);
   redirect.isConnected = true;
 
