@@ -8,7 +8,6 @@
 
 DNSServer dnsServer;
 const byte DNS_PORT = 53;
-IPAddress apIP(192, 168, 4, 1);
 
 struct Params_wifi {
   const char* ssid;
@@ -43,7 +42,7 @@ public:
     bool runAp = false,
     bool runSta = true,
     bool startServer = false,
-     void (*onConnect)() = nullptr);
+    void (*onConnect)() = nullptr);
   void init(const Params_wifi& params);
 
   void addDomain(const char* domain);
@@ -56,11 +55,11 @@ private:
   const char* password;
   const char* ap_ssid;
   const char* ap_password;
-  const char* domain;
+  const char* domain = nullptr;
   bool isServer = false;
   bool runAp = false;
   bool runSta = true;
-  void (*onConnect)() = nullptr; 
+  void (*onConnect)() = nullptr;
 };
 
 inline void CONNECT::init(const Params_wifi& params) {
@@ -95,6 +94,7 @@ inline void CONNECT::init(
     WiFi.softAPConfig(apIP, apIP, IPAddress(255, 255, 255, 0));
     Serial.print("AP IP address: ");  // This is for hotspot IP
     Serial.println(WiFi.softAPIP());
+    dnsServer.start(DNS_PORT, "*", apIP);  // DNS -> use native IP address for accessing esp32 --> 192.168.4.1
   }
 
   if (runSta) {
@@ -110,7 +110,7 @@ inline void CONNECT::init(
 
   if (isServer) {
     if (this->webServers) {
-      this->webServers();   // call callback
+      this->webServers();  // call callback
     }
 
     server.begin();
@@ -132,15 +132,29 @@ inline void CONNECT::addDomain(const char* domain) {
 inline void CONNECT::changeDNS(const char* domain, Dns_Target target) {
   const char* prevDomain = this->domain;
 
-  MDNS.end();
   switch (target) {
     case DEFAULT_DNS:
-      MDNS.begin(defaultIP);
+      dnsServer.start(DNS_PORT, "*", apIP);  // DNS -> use native IP address for accessing esp32 --> 192.168.4.1
       break;
+
     case CHANGE_DNS:
-      MDNS.begin(domain);
+      MDNS.end();
+      if (MDNS.begin(domain)) {
+        this->domain = domain;
+      }
       break;
+
     default:
+      bool hasDomain() {
+        return prevDomain == nullptr || prevDomain[0] == '\0';
+      }
+      
+      if (hasDomain()) {
+        dnsServer.start(DNS_PORT, "*", apIP);
+        return;
+      }
+
+      MDNS.end();
       MDNS.begin(prevDomain);
       break;
   }

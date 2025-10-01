@@ -12,8 +12,6 @@
 #include "utils.h"
 
 // CONSTANT DECLARATIONS
-DNSServer dnsServer;
-const byte DNS_PORT = 53;
 IPAddress apIP(192, 168, 4, 1); // default
 WebServer server(80);
 
@@ -49,7 +47,7 @@ void setup() {
   preferences.begin("store", false);
   esp32.init(params);
   EspWiFi.addDomain("esp32"); // add domain to AP/alternative URI for default IP access to portal --> http://esp32.local
-  dnsServer.start(DNS_PORT, "*", apIP); // DNS -> use native IP address for accessing esp32 --> 192.168.4.1
+  // dnsServer.start(DNS_PORT, "*", apIP); // DNS -> use native IP address for accessing esp32 --> 192.168.4.1
 
 
   // WEB SERVER ROUTES
