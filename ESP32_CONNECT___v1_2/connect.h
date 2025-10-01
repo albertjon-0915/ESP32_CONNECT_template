@@ -4,6 +4,11 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <ESPmDNS.h>
+#include <DNSServer.h>
+
+DNSServer dnsServer;
+const byte DNS_PORT = 53;
+IPAddress apIP(192, 168, 4, 1);
 
 struct Params_wifi {
   const char* ssid;
@@ -14,6 +19,13 @@ struct Params_wifi {
   bool runAp = false;
   bool runSta = true;
   bool startServer = false;
+
+  void (*webServers)() = nullptr;
+};
+
+enum Dns_Target {
+  DEFAULT_DNS,
+  CHANGE_DNS
 };
 
 // extern WiFiServer server; --> WebServer is running on top of this
@@ -30,10 +42,12 @@ public:
     const char* ap_password = "",
     bool runAp = false,
     bool runSta = true,
-    bool startServer = false);
+    bool startServer = false,
+     void (*onConnect)() = nullptr);
   void init(const Params_wifi& params);
 
   void addDomain(const char* domain);
+  void changeDNS(const char* domain);
   String getIpAddress();
   void addServer(void (*setup)(WiFiClient&));
 
@@ -46,6 +60,7 @@ private:
   bool isServer = false;
   bool runAp = false;
   bool runSta = true;
+  void (*onConnect)() = nullptr; 
 };
 
 inline void CONNECT::init(const Params_wifi& params) {
@@ -57,18 +72,13 @@ inline void CONNECT::init(const Params_wifi& params) {
     params.ap_password,
     params.runAp,
     params.runSta,
-    params.startServer);
+    params.startServer,
+    params.webServers);
 }
 
 inline void CONNECT::init(
-  const char* ssid,
-  const char* password,
-  wifi_mode_t mode,
-  const char* ap_ssid,
-  const char* ap_password,
-  bool runAp,
-  bool runSta,
-  bool startServer) {
+  const char* ssid, const char* password, wifi_mode_t mode, const char* ap_ssid, const char* ap_password, bool runAp, bool runSta, bool startServer, void (*webServers)()) {
+
   this->ssid = ssid;
   this->password = password;
   this->ap_ssid = ap_ssid;
@@ -99,6 +109,10 @@ inline void CONNECT::init(
   }
 
   if (isServer) {
+    if (this->webServers) {
+      this->webServers();   // call callback
+    }
+
     server.begin();
     Serial.println("Server started");
   }
@@ -112,6 +126,23 @@ inline void CONNECT::addDomain(const char* domain) {
     Serial.println(".local");
   } else {
     Serial.println("Error starting MDNS");
+  }
+}
+
+inline void CONNECT::changeDNS(const char* domain, Dns_Target target) {
+  const char* prevDomain = this->domain;
+
+  MDNS.end();
+  switch (target) {
+    case DEFAULT_DNS:
+      MDNS.begin(defaultIP);
+      break;
+    case CHANGE_DNS:
+      MDNS.begin(domain);
+      break;
+    default:
+      MDNS.begin(prevDomain);
+      break;
   }
 }
 

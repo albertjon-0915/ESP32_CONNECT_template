@@ -2,6 +2,17 @@
 
 */
 
+void serverHandlers() {
+  MDNS.update();
+  dnsServer.processNextRequest();
+  server.handleClient();
+}
+
+void serverRoutes() {
+  server.on("/", handleConnectWifiPortal);
+  server.on("/disconnect", handleDisconnectPortal);
+  server.on("/disconnect/success", handleDisconnect);
+}
 
 void fireBaseMutation() {
   if (Firebase.ready() && signUpOk) {
