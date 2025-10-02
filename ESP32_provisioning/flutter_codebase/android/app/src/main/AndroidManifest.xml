@@ -6,7 +6,7 @@
        
     
     <application
-        android:label="flutter_codebase"
+        android:label="espGo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
