@@ -108,7 +108,6 @@ class _MyHomePageState extends State<MyHomePage> {
         wifiName = normalizeWifiName(name);
         wifiBSSID = bssid;
       });
-      
     } on PlatformException catch (e) {
       developer.log('Failed', error: e);
       wifiName = 'Failed to get Wifi Name';
@@ -210,10 +209,7 @@ class _MyHomePageState extends State<MyHomePage> {
         children: <Widget>[
           Column(
             children: [
-              Image.network(
-                'https://blog.grobotronics.com/wp-content/uploads/2024/05/esp32-c6-socs.png',
-                height: 150,
-              ),
+              Image.asset('assets/home_image.png', height: 150),
               Padding(
                 padding: const EdgeInsets.fromLTRB(24, 15, 24, 5),
                 child: Text(
